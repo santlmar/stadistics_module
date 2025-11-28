@@ -38,33 +38,33 @@ jobs:
       - name: Instalar Dependencias de Node.js
         run: |
           npm install
-        working-directory: ${{ env.TERRAFORM_DIR }}
+        working-directory: ${{ secrets.TERRAFORM_DIR }}
 
       - name: Build de la Función Lambda
         run: |
           # Esto ejecuta tu script 'build' que compila el TS en JS y lo pone en '../dist'
           npm run build
-        working-directory: ${{ env.TERRAFORM_DIR }}
+        working-directory: ${{ secrets.TERRAFORM_DIR }}
 
       # Paso 3: Inicializar Terraform (descarga plugins y configura el backend)
       - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: ${{ env.TERRAFORM_DIR }}
+        working-directory: ${{ secrets.TERRAFORM_DIR }}
 
       # Paso 4: Validar la sintaxis de los archivos .tf
       - name: Terraform Validate
         id: validate
         run: terraform validate
-        working-directory: ${{ env.TERRAFORM_DIR }}
+        working-directory: ${{ secrets.TERRAFORM_DIR }}
 
       # Paso 6: Aplicar los cambios de infraestructura
       - name: Terraform Apply
         id: apply
         # Aplicar si el plan fue exitoso y el branch es 'main'
         run: terraform apply -auto-approve
-        working-directory: ${{ env.TERRAFORM_DIR }}
+        working-directory: ${{ secrets.TERRAFORM_DIR }}
 
       - name: Mostrar Endpoints
         run: terraform output -json full_status_endpoint
-        working-directory: ${{ env.TERRAFORM_DIR }}
+        working-directory: ${{ secrets.TERRAFORM_DIR }}
