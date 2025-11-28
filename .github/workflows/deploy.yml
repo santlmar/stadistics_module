@@ -58,13 +58,6 @@ jobs:
         run: terraform validate
         working-directory: ${{ env.TERRAFORM_DIR }}
 
-      # Paso 5: Crear el plan de despliegue (opcional, pero buena práctica)
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -out=tfplan
-        working-directory: ${{ env.TERRAFORM_DIR }}
-        continue-on-error: true # Permite que el despliegue continúe incluso si hay un cambio mínimo
-
       # Paso 6: Aplicar los cambios de infraestructura
       - name: Terraform Apply
         id: apply
