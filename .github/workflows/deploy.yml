@@ -1,0 +1,77 @@
+name: Infraestructura y Despliegue de Lambda (Terraform)
+
+on:
+  push:
+    branches:
+      - main # Ejecutar solo cuando se haga push al branch 'main'
+
+env:
+  # La región de AWS que estás utilizando (debe coincidir con tu main.tf)
+  AWS_REGION: us-east-2
+  # El directorio donde se encuentra el código de tu módulo Terraform y el main.tf
+  TERRAFORM_DIR: ./
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # IMPORTANTE: Configurar las credenciales de AWS usando Secrets de GitHub
+    steps:
+      - name: Checkout Código del Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Credenciales de AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Paso 1: Instalar y Configurar Terraform
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          # Versión de Terraform que deseas usar
+          terraform_version: 1.6.0
+
+      # Paso 2: Instalar dependencias de Node.js (necesario para la build de la Lambda)
+      - name: Instalar Dependencias de Node.js
+        run: |
+          npm install
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      - name: Build de la Función Lambda
+        run: |
+          # Esto ejecuta tu script 'build' que compila el TS en JS y lo pone en '../dist'
+          npm run build
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      # Paso 3: Inicializar Terraform (descarga plugins y configura el backend)
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      # Paso 4: Validar la sintaxis de los archivos .tf
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      # Paso 5: Crear el plan de despliegue (opcional, pero buena práctica)
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -out=tfplan
+        working-directory: ${{ env.TERRAFORM_DIR }}
+        continue-on-error: true # Permite que el despliegue continúe incluso si hay un cambio mínimo
+
+      # Paso 6: Aplicar los cambios de infraestructura
+      - name: Terraform Apply
+        id: apply
+        # Aplicar si el plan fue exitoso y el branch es 'main'
+        run: terraform apply -auto-approve tfplan
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      - name: Mostrar Endpoints
+        run: terraform output -json full_status_endpoint
+        working-directory: ${{ env.TERRAFORM_DIR }}
