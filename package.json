@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.940.0",
+    "@aws-sdk/lib-dynamodb": "^3.940.0",
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/platform-express": "^11.1.9",
+    "aws-lambda": "^1.0.7"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.14",
+    "@types/aws-lambda": "^8.10.159",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}
