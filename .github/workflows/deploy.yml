@@ -62,7 +62,7 @@ jobs:
       - name: Terraform Apply
         id: apply
         # Aplicar si el plan fue exitoso y el branch es 'main'
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
         working-directory: ${{ env.TERRAFORM_DIR }}
 
       - name: Mostrar Endpoints
