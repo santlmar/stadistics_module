@@ -3,8 +3,6 @@
 # Configuración del proveedor AWS usando las variables definidas
 provider "aws" {
   region = "us-east-2"  # Cambia según tu región preferida
-  access_key = secrets.AWS_ACCESS_KEY_ID
-  secret_key = secrets.AWS_SECRET_ACCESS_KEY
 
     default_tags {
     tags = {
